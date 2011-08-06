@@ -1,0 +1,15 @@
+11-07-11 - Version 0.1
+	- Add NOTICE, AUTHOR, COPYRIGHT and this file.
+	- Renamed the packages to net.sf.temporaljdbcproxy (this is temporary)
+	- Replaced the copyright in all the files.
+	- Modify the TemporalizeSchema functionality to include `tend` column in the primary key if any.
+	- NOTE: Current version of TemporalizeSchema only supports MySQL schemas.
+	- TemporalizeSchema to run on all tables in a schema.
+	- Attempt to have clearBatch and addBatch working, however the logic of having a batch of Updates followed
+	by a batch of Insert (in a temporal Update) fails in many scenarios.
+	- Package rename to us.curino.temporalsql
+		
+OLDER
+	This list includes changes done from the initial version of Carlo
+	- Add a TemporalDriverManager that returns a connection
+	- Close() method for PreparedStatement.
