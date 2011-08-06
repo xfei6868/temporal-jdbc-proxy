@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="temporal_jdbcproxy">
+    <property environment="env"/>
+    <property name="BenchmarkSQL.location" value="../BenchmarkSQL"/>
+    <property name="BenchmarkSQL_modified.location" value="../BenchmarkSQL_modified"/>
+    <property name="tsqlparser.location" value="../tsqlparser"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="tsqlparser.classpath">
+        <pathelement location="${tsqlparser.location}/bin"/>
+    </path>
+    <path id="temporal_jdbcproxy.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/slf4j-api-1.6.0.jar"/>
+        <pathelement location="lib/mysql-connector-java-5.1.10-bin.jar"/>
+        <pathelement location="lib/log4j-1.2.16.jar"/>
+        <pathelement location="lib/slf4j-log4j12-1.6.1.jar"/>
+        <pathelement location="lib/postgresql-8.0.309.jdbc3.jar"/>
+        <path refid="tsqlparser.classpath"/>
+    </path>
+    <path id="run.TestJDBCProxy.classpath">
+        <pathelement location="."/>
+        <path refid="temporal_jdbcproxy.classpath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${tsqlparser.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${tsqlparser.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="temporal_jdbcproxy.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${BenchmarkSQL.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${BenchmarkSQL.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${BenchmarkSQL_modified.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${BenchmarkSQL_modified.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="TemporalizeSchema (1)">
+        <java classname="us.curino.temporalsql.TemporalizeSchema" failonerror="true" fork="yes">
+            <arg line="config/default.properties"/>
+            <classpath refid="temporal_jdbcproxy.classpath"/>
+        </java>
+    </target>
+    <target name="TestJDBCProxy">
+        <java classname="us.curino.temporalsql.TestJDBCProxy" failonerror="true" fork="yes">
+            <arg line="config/default.properties"/>
+            <classpath refid="run.TestJDBCProxy.classpath"/>
+        </java>
+    </target>
+</project>
